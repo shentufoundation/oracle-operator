@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/certikfoundation/shentu/toolsets/oracle-operator/types"
-	"github.com/certikfoundation/shentu/x/oracle"
+	oracletypes "github.com/certikfoundation/shentu/x/oracle/types"
 )
 
 // Push pushes MsgInquiryEvent to certik chain.
@@ -15,7 +15,7 @@ func Push(ctx types.Context, ctkMsgChan <-chan interface{}, errorChan chan<- err
 			return
 		case msg := <-ctkMsgChan:
 			switch m := msg.(type) {
-			case oracle.MsgTaskResponse:
+			case oracletypes.MsgTaskResponse:
 				go PushMsgTaskResponse(ctx.WithLoggerLabels("type", "MsgTaskResponse"), m)
 			}
 		}
@@ -23,13 +23,13 @@ func Push(ctx types.Context, ctkMsgChan <-chan interface{}, errorChan chan<- err
 }
 
 // PushMsgTaskResponse pushes MsgTaskResponse message to CertiK Chain.
-func PushMsgTaskResponse(ctx types.Context, msg oracle.MsgTaskResponse) {
+func PushMsgTaskResponse(ctx types.Context, msg oracletypes.MsgTaskResponse) {
 	logger := ctx.Logger()
 	if err := msg.ValidateBasic(); err != nil {
 		ctx.Logger().Error(err.Error())
 		return
 	}
-	receipt, err := CompleteAndBroadcastTx(ctx.ClientContext(), ctx.TxBuilder(), []sdk.Msg{msg})
+	receipt, err := CompleteAndBroadcastTx(ctx.ClientContext(), ctx.TxBuilder(), []sdk.Msg{&msg})
 	if err != nil {
 		ctx.Logger().Error(err.Error())
 		return

@@ -7,14 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/viper"
-
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/input"
-	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/hyperledger/burrow/crypto"
@@ -23,61 +19,60 @@ import (
 
 	"github.com/certikfoundation/shentu/common"
 	"github.com/certikfoundation/shentu/toolsets/oracle-operator/types"
-	"github.com/certikfoundation/shentu/x/cvm"
 	"github.com/certikfoundation/shentu/x/cvm/compile"
+	cvmtypes "github.com/certikfoundation/shentu/x/cvm/types"
 )
 
 // CompleteAndBroadcastTx is adopted from auth.CompleteAndBroadcastTxCLI. The original function prints out response.
-func CompleteAndBroadcastTx(cliCtx context.CLIContext, txBldr authtypes.TxBuilder, msgs []sdk.Msg) (sdk.TxResponse, error) {
-	txBldr, err := utils.PrepareTxBuilder(txBldr, cliCtx)
+// FIX COMMENT: tx.BroadcastTx()
+func CompleteAndBroadcastTx(cliCtx client.Context, txf tx.Factory, msgs []sdk.Msg) (sdk.TxResponse, error) {
+	txf, err := tx.PrepareFactory(cliCtx, txf)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	fromName := cliCtx.GetFromName()
-
-	if txBldr.SimulateAndExecute() || cliCtx.Simulate {
-		txBldr, err = utils.EnrichWithGas(txBldr, cliCtx, msgs)
+	if txf.SimulateAndExecute() || cliCtx.Simulate {
+		_, adjusted, err := tx.CalculateGas(cliCtx.QueryWithData, txf, msgs...)
 		if err != nil {
 			return sdk.TxResponse{}, err
 		}
 
-		gasEst := utils.GasEstimateResponse{GasEstimate: txBldr.Gas()}
-		_, _ = fmt.Fprintf(os.Stderr, "%s\n", gasEst.String())
+		txf = txf.WithGas(adjusted)
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n", tx.GasEstimateResponse{GasEstimate: txf.Gas()})
 	}
 
 	if cliCtx.Simulate {
 		return sdk.TxResponse{}, nil
 	}
 
+	unsignedTx, err := tx.BuildUnsignedTx(txf, msgs...)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
 	if !cliCtx.SkipConfirm {
-		stdSignMsg, err := txBldr.BuildSignMsg(msgs)
+		out, err := cliCtx.TxConfig.TxJSONEncoder()(unsignedTx.GetTx())
 		if err != nil {
 			return sdk.TxResponse{}, err
 		}
 
-		var rawJSON []byte
-		if viper.GetBool(flags.FlagIndentResponse) {
-			rawJSON, err = cliCtx.Codec.MarshalJSONIndent(stdSignMsg, "", "  ")
-			if err != nil {
-				return sdk.TxResponse{}, err
-			}
-		} else {
-			rawJSON = cliCtx.Codec.MustMarshalJSON(stdSignMsg)
-		}
-
-		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", rawJSON)
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", out)
 
 		buf := bufio.NewReader(os.Stdin)
-		ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf)
+		ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf, os.Stderr)
+
 		if err != nil || !ok {
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n", "canceled transaction")
 			return sdk.TxResponse{}, err
 		}
 	}
 
-	// build and sign the transaction
-	txBytes, err := txBldr.BuildAndSign(fromName, keys.DefaultKeyPass, msgs)
+	err = tx.Sign(txf, cliCtx.GetFromName(), unsignedTx, true)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	txBytes, err := cliCtx.TxConfig.TxEncoder()(unsignedTx.GetTx())
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -88,7 +83,71 @@ func CompleteAndBroadcastTx(cliCtx context.CLIContext, txBldr authtypes.TxBuilde
 		return sdk.TxResponse{}, err
 	}
 
-	return res, nil
+	return *res, nil
+
+	/*
+		txBldr, err := utils.PrepareTxBuilder(txBldr, cliCtx)
+		if err != nil {
+			return sdk.TxResponse{}, err
+		}
+
+		fromName := cliCtx.GetFromName()
+
+		if txBldr.SimulateAndExecute() || cliCtx.Simulate {
+			txBldr, err = utils.EnrichWithGas(txBldr, cliCtx, msgs)
+			if err != nil {
+				return sdk.TxResponse{}, err
+			}
+
+			gasEst := utils.GasEstimateResponse{GasEstimate: txBldr.Gas()}
+			_, _ = fmt.Fprintf(os.Stderr, "%s\n", gasEst.String())
+		}
+
+		if cliCtx.Simulate {
+			return sdk.TxResponse{}, nil
+		}
+
+		if !cliCtx.SkipConfirm {
+			stdSignMsg, err := txBldr.BuildSignMsg(msgs)
+			if err != nil {
+				return sdk.TxResponse{}, err
+			}
+
+			var rawJSON []byte
+			if viper.GetBool(flags.FlagIndentResponse) {
+				rawJSON, err = cliCtx.Codec.MarshalJSONIndent(stdSignMsg, "", "  ")
+				if err != nil {
+					return sdk.TxResponse{}, err
+				}
+			} else {
+				rawJSON = cliCtx.Codec.MustMarshalJSON(stdSignMsg)
+			}
+
+			_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", rawJSON)
+
+			buf := bufio.NewReader(os.Stdin)
+			ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf)
+			if err != nil || !ok {
+				_, _ = fmt.Fprintf(os.Stderr, "%s\n", "canceled transaction")
+				return sdk.TxResponse{}, err
+			}
+		}
+
+		// build and sign the transaction
+		txBytes, err := txBldr.BuildAndSign(fromName, keys.DefaultKeyPass, msgs)
+		if err != nil {
+			return sdk.TxResponse{}, err
+		}
+
+		// broadcast to a Tendermint node
+		res, err := cliCtx.BroadcastTx(txBytes)
+		if err != nil {
+			return sdk.TxResponse{}, err
+		}
+
+		return res, nil
+
+	*/
 }
 
 // callContract calls contract on certik-chain.
@@ -99,12 +158,12 @@ func callContract(ctx types.Context, calleeString string, function string, args 
 	if err != nil {
 		return false, "", err
 	}
-	accGetter := authtypes.NewAccountRetriever(cliCtx)
-	if err := accGetter.EnsureExists(calleeAddr); err != nil {
+	accGetter := authtypes.AccountRetriever{}
+	if err := accGetter.EnsureExists(cliCtx, calleeAddr); err != nil {
 		return false, "", err
 	}
 
-	abiSpec, err := queryAbi(cliCtx, cvm.QuerierRoute, calleeString)
+	abiSpec, err := queryAbi(cliCtx, cvmtypes.QuerierRoute, calleeString)
 	if err != nil {
 		return false, "", err
 	}
@@ -128,7 +187,7 @@ func callContract(ctx types.Context, calleeString string, function string, args 
 		if entry.Type != "view" && entry.Type != "pure" {
 			return false, "", fmt.Errorf("getInsight function should be view or pure function")
 		}
-		queryPath := fmt.Sprintf("custom/%s/view/%s/%s", cvm.QuerierRoute, cliCtx.GetFromAddress(), calleeAddr)
+		queryPath := fmt.Sprintf("custom/%s/view/%s/%s", cvmtypes.QuerierRoute, cliCtx.GetFromAddress(), calleeAddr)
 		return queryContract(cliCtx, queryPath, function, abiSpec, data)
 	}
 	return false, "", fmt.Errorf("function %s was not found in abi", function)

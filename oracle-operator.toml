@@ -6,8 +6,8 @@ timeout = 300 # second
 # combination strategy
 type = "linear"
 [[strategy.eth.primitive]]
-primitive_contract_address = "certik1r4834vyyu8vrarxgyatn34j8lsguyhn7csl0ju"
+primitive_contract_address = "certik12w4spwv6ku9q8qmmkj5tgj5gjtmhf634zcwaxk"
 weight = 0.1
 [[strategy.eth.primitive]]
-primitive_contract_address = "certik1r4834vyyu8vrarxgyatn34j8lsguyhn7csl0ju"
+primitive_contract_address = "certik12w4spwv6ku9q8qmmkj5tgj5gjtmhf634zcwaxk"
 weight = 0.1

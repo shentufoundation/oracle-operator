@@ -7,10 +7,10 @@ import (
 	"sync"
 
 	"github.com/certikfoundation/shentu/toolsets/oracle-operator/types"
-	"github.com/certikfoundation/shentu/x/oracle"
+	oracletypes "github.com/certikfoundation/shentu/x/oracle/types"
 )
 
-func getPrimitivePayload(msg oracle.MsgCreateTask) (types.PrimitivePayload, error) {
+func getPrimitivePayload(msg oracletypes.MsgCreateTask) (types.PrimitivePayload, error) {
 	client, contract, err := parseMsgCreateTaskContract(msg.Contract)
 	if err != nil {
 		return types.PrimitivePayload{}, fmt.Errorf("wrong task contract format: %s", err.Error())

@@ -7,26 +7,26 @@ import (
 
 	"github.com/hyperledger/burrow/execution/evm/abi"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 
-	"github.com/certikfoundation/shentu/x/cvm"
+	cvmtypes "github.com/certikfoundation/shentu/x/cvm/types"
 )
 
 // queryAbi queries ABI from certik chain
-func queryAbi(cliCtx context.CLIContext, queryRoute string, addr string) ([]byte, error) {
+func queryAbi(cliCtx client.Context, queryRoute string, addr string) ([]byte, error) {
 	res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/abi/%s", queryRoute, addr), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var out cvm.QueryResAbi
-	cliCtx.Codec.MustUnmarshalJSON(res, &out)
+	var out cvmtypes.QueryResAbi
+	cliCtx.LegacyAmino.MustUnmarshalJSON(res, &out)
 	return out.Abi, nil
 }
 
 // queryContract queries contract on certik-chain.
 func queryContract(
-	cliCtx context.CLIContext,
+	cliCtx client.Context,
 	queryPath, fname string,
 	abiSpec, data []byte,
 ) (bool, string, error) {
@@ -34,7 +34,7 @@ func queryContract(
 	if err != nil {
 		return false, "", fmt.Errorf("querying security primitive contract: %v", err)
 	}
-	var out cvm.QueryResView
+	var out cvmtypes.QueryResView
 	err = json.Unmarshal(res, &out)
 	if err != nil {
 		return false, "", err

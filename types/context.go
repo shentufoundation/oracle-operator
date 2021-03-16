@@ -6,30 +6,30 @@ import (
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/log"
 
-	clientcontext "github.com/cosmos/cosmos-sdk/client/context"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 )
 
 // Context define the type of data for the operator node.
 type Context struct {
-	*clientcontext.CLIContext
-	ctx       context.Context
-	txBuilder *authtypes.TxBuilder
-	config    *Config
-	logger    log.Logger
+	CLIContext *client.Context
+	ctx        context.Context
+	txFactory  *tx.Factory
+	config     *Config
+	logger     log.Logger
 }
 
 // Context returns the internal context object.
 func (c Context) Context() context.Context { return c.ctx }
 
 // ClientContext returns a copy of the certik chain client context object value.
-func (c Context) ClientContext() clientcontext.CLIContext { return *c.CLIContext }
+func (c Context) ClientContext() client.Context { return *c.CLIContext }
 
 // Codec returns a reference to the client codec.
-func (c Context) Codec() *amino.Codec { return c.CLIContext.Codec }
+func (c Context) Codec() *amino.Codec { return c.CLIContext.LegacyAmino.Amino }
 
 // TxBuilder returns a copy of the certik chain transaction builder object.
-func (c Context) TxBuilder() authtypes.TxBuilder { return *c.txBuilder }
+func (c Context) TxBuilder() tx.Factory { return *c.txFactory }
 
 // Config returns a copy of the oracle operator node global configuration.
 func (c Context) Config() Config { return *c.config }
@@ -51,9 +51,9 @@ func NewContextWithDefaultConfigAndLogger() (Context, error) {
 // NewContext creates a new context.
 func NewContext(config *Config, logger log.Logger) Context {
 	return Context{
-		CLIContext: &clientcontext.CLIContext{},
+		CLIContext: &client.Context{},
 		ctx:        context.Background(),
-		txBuilder:  &authtypes.TxBuilder{},
+		txFactory:  &tx.Factory{},
 		config:     config,
 		logger:     logger,
 	}
@@ -66,14 +66,14 @@ func (c Context) WithContext(ctx context.Context) Context {
 }
 
 // WithClientContext returns a copy of the context with an updated CosmoSDK client context.
-func (c Context) WithClientContext(ctx *clientcontext.CLIContext) Context {
+func (c Context) WithClientContext(ctx *client.Context) Context {
 	c.CLIContext = ctx
 	return c
 }
 
-// WithTxBuilder returns a copy of the context with an updated tx builder.
-func (c Context) WithTxBuilder(txBuilder *authtypes.TxBuilder) Context {
-	c.txBuilder = txBuilder
+// WithTxFactory returns a copy of the context with an updated tx builder.
+func (c Context) WithTxFactory(txFactory *tx.Factory) Context {
+	c.txFactory = txFactory
 	return c
 }
 

@@ -2,20 +2,16 @@
 package oracle
 
 import (
-	"bufio"
 	"os"
 
 	"github.com/spf13/cobra"
 
 	tmconfig "github.com/tendermint/tendermint/config"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	authtxb "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/certikfoundation/shentu/toolsets/oracle-operator/types"
 )
@@ -34,17 +30,21 @@ func start(ctx types.Context) {
 }
 
 // ServeCommand will start the oracle operator as a blocking process.
-func ServeCommand(cdc *codec.Codec) *cobra.Command {
+func ServeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "oracle-operator",
 		Short: "Start oracle operator",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			txf := tx.NewFactoryCLI(cliCtx, cmd.Flags()).WithTxConfig(cliCtx.TxConfig).WithAccountRetriever(cliCtx.AccountRetriever)
+
+			accGetter := txf.AccountRetriever()
 			cliCtx.SkipConfirm = true // TODO: new cosmos version
-			accGetter := authtxb.NewAccountRetriever(cliCtx)
-			if _, err := accGetter.GetAccount(cliCtx.GetFromAddress()); err != nil {
+			if err := accGetter.EnsureExists(cliCtx, cliCtx.GetFromAddress()); err != nil {
 				return err
 			}
 
@@ -52,7 +52,7 @@ func ServeCommand(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ctx = ctx.WithClientContext(&cliCtx).WithTxBuilder(&txBldr)
+			ctx = ctx.WithClientContext(&cliCtx).WithTxFactory(&txf)
 
 			if err := serve(ctx); err != nil {
 				return err
@@ -66,9 +66,9 @@ func ServeCommand(cdc *codec.Codec) *cobra.Command {
 
 // registerFlags registers additional flags to the command.
 func registerFlags(cmd *cobra.Command) *cobra.Command {
-	cmd = flags.PostCommands(cmd)[0]
-	cmd.Flags().Uint(flags.FlagRPCReadTimeout, 10, "RPC read timeout (in seconds)")
-	cmd.Flags().Uint(flags.FlagRPCWriteTimeout, 10, "RPC write timeout (in seconds)")
+	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().Uint(types.FlagRPCReadTimeout, 10, "RPC read timeout (in seconds)")
+	cmd.Flags().Uint(types.FlagRPCWriteTimeout, 10, "RPC write timeout (in seconds)")
 	cmd.Flags().String(types.FlagLogLevel, tmconfig.DefaultLogLevel(), "Log level")
 	cmd.Flags().String(types.FlagConfigFile, types.DefaultConfigFileName, "Name of the config file")
 	return cmd

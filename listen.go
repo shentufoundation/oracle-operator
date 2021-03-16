@@ -10,7 +10,7 @@ import (
 	tendermintTypes "github.com/tendermint/tendermint/types"
 
 	"github.com/certikfoundation/shentu/toolsets/oracle-operator/types"
-	"github.com/certikfoundation/shentu/x/oracle"
+	oracletypes "github.com/certikfoundation/shentu/x/oracle/types"
 )
 
 // Listen listens for events from CertiK chain.
@@ -97,21 +97,21 @@ func handleMsgCreateTask(ctx types.Context, event abciTypes.Event, ctkMsgChan ch
 	}
 	// get primitive socres
 	var wg sync.WaitGroup
-	primivieScores := make(chan types.PrimitiveScore, len(strategy.Primitives))
+	primitiveScores := make(chan types.PrimitiveScore, len(strategy.Primitives))
 	wg.Add(len(strategy.Primitives))
 	for _, primitive := range strategy.Primitives {
 		go queryPrimitive(
 			ctx.WithLoggerLabels("primitive", primitive),
 			primitive,
 			payload,
-			primivieScores,
+			primitiveScores,
 			&wg,
 		)
 	}
 	wg.Wait()
-	close(primivieScores)
+	close(primitiveScores)
 	// aggregate primitive scores
-	score, err := aggregator.Aggregate(primivieScores)
+	score, err := aggregator.Aggregate(primitiveScores)
 	if err != nil {
 		logger.Error("aggregation failed", "type", strategy.Type, "error", err.Error(), "payload", payload)
 		return
@@ -123,7 +123,7 @@ func handleMsgCreateTask(ctx types.Context, event abciTypes.Event, ctkMsgChan ch
 		"payload", payload,
 	)
 	// push back
-	ctkMsgChan <- oracle.NewMsgTaskResponse(
+	ctkMsgChan <- oracletypes.NewMsgTaskResponse(
 		msgCreateTask.Contract,
 		msgCreateTask.Function,
 		int64(score),
@@ -132,23 +132,23 @@ func handleMsgCreateTask(ctx types.Context, event abciTypes.Event, ctkMsgChan ch
 }
 
 // parseMsgCreateTask parses TX data of creating tasks.
-func parseMsgCreateTask(event abciTypes.Event) (oracle.MsgCreateTask, error) {
+func parseMsgCreateTask(event abciTypes.Event) (oracletypes.MsgCreateTask, error) {
 	var contract, function string
 	for _, v := range event.GetAttributes() {
 		switch string(v.GetKey()) {
 		case "contract":
 			contract = string(v.GetValue())
 			if contract == "" {
-				return oracle.MsgCreateTask{}, fmt.Errorf("missing contract in event content")
+				return oracletypes.MsgCreateTask{}, fmt.Errorf("missing contract in event content")
 			}
 		case "function":
 			function = string(v.GetValue())
 			if function == "" {
-				return oracle.MsgCreateTask{}, fmt.Errorf("missing function in event content")
+				return oracletypes.MsgCreateTask{}, fmt.Errorf("missing function in event content")
 			}
 		}
 	}
-	msgCreateTask := oracle.MsgCreateTask{
+	msgCreateTask := oracletypes.MsgCreateTask{
 		Contract: contract,
 		Function: function,
 	}
