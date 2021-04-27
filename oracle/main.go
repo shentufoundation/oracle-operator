@@ -32,7 +32,7 @@ func start(ctx types.Context) {
 // ServeCommand will start the oracle operator as a blocking process.
 func ServeCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "oracle-operator",
+		Use:   "start",
 		Short: "Start oracle operator",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			cliCtx, err := client.GetClientTxContext(cmd)
@@ -40,13 +40,9 @@ func ServeCommand() *cobra.Command {
 				return err
 			}
 
-			txf := tx.NewFactoryCLI(cliCtx, cmd.Flags()).WithTxConfig(cliCtx.TxConfig).WithAccountRetriever(cliCtx.AccountRetriever)
+			txf := tx.NewFactoryCLI(cliCtx, cmd.Flags()).WithTxConfig(cliCtx.TxConfig)
 
-			accGetter := txf.AccountRetriever()
 			cliCtx.SkipConfirm = true // TODO: new cosmos version
-			if err := accGetter.EnsureExists(cliCtx, cliCtx.GetFromAddress()); err != nil {
-				return err
-			}
 
 			ctx, err := types.NewContextWithDefaultConfigAndLogger()
 			if err != nil {

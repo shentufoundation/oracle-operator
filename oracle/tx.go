@@ -15,17 +15,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/certikfoundation/shentu/common"
 	"github.com/certikfoundation/shentu/x/cvm/compile"
-	cvmtypes "github.com/certikfoundation/shentu/x/cvm/types"
 
 	"github.com/certikfoundation/oracle-toolset/types"
 )
 
 // CompleteAndBroadcastTx is adopted from auth.CompleteAndBroadcastTxCLI. The original function prints out response.
-// FIX COMMENT: tx.BroadcastTx()
 func CompleteAndBroadcastTx(cliCtx client.Context, txf tx.Factory, msgs []sdk.Msg) (sdk.TxResponse, error) {
 	txf, err := tx.PrepareFactory(cliCtx, txf)
 	if err != nil {
@@ -85,77 +84,52 @@ func CompleteAndBroadcastTx(cliCtx client.Context, txf tx.Factory, msgs []sdk.Ms
 	}
 
 	return *res, nil
+}
 
-	/*
-		txBldr, err := utils.PrepareTxBuilder(txBldr, cliCtx)
-		if err != nil {
-			return sdk.TxResponse{}, err
-		}
+// accAddressFromBech32 creates an AccAddress from a Bech32 string.
+func accAddressFromBech32(address string) (addr sdk.AccAddress, err error) {
+	if len(strings.TrimSpace(address)) == 0 {
+		return sdk.AccAddress{}, fmt.Errorf("empty address string is not allowed")
+	}
 
-		fromName := cliCtx.GetFromName()
+	//bech32PrefixAccAddr := GetConfig().GetBech32AccountAddrPrefix()
 
-		if txBldr.SimulateAndExecute() || cliCtx.Simulate {
-			txBldr, err = utils.EnrichWithGas(txBldr, cliCtx, msgs)
-			if err != nil {
-				return sdk.TxResponse{}, err
-			}
+	bz, err := sdk.GetFromBech32(address, "certik")
+	if err != nil {
+		return nil, err
+	}
 
-			gasEst := utils.GasEstimateResponse{GasEstimate: txBldr.Gas()}
-			_, _ = fmt.Fprintf(os.Stderr, "%s\n", gasEst.String())
-		}
+	err = sdk.VerifyAddressFormat(bz)
+	if err != nil {
+		return nil, err
+	}
 
-		if cliCtx.Simulate {
-			return sdk.TxResponse{}, nil
-		}
+	return sdk.AccAddress(bz), nil
+}
 
-		if !cliCtx.SkipConfirm {
-			stdSignMsg, err := txBldr.BuildSignMsg(msgs)
-			if err != nil {
-				return sdk.TxResponse{}, err
-			}
+// String implements the Stringer interface.
+func stringify(aa sdk.AccAddress) string {
+	if aa.Empty() {
+		return ""
+	}
 
-			var rawJSON []byte
-			if viper.GetBool(flags.FlagIndentResponse) {
-				rawJSON, err = cliCtx.Codec.MarshalJSONIndent(stdSignMsg, "", "  ")
-				if err != nil {
-					return sdk.TxResponse{}, err
-				}
-			} else {
-				rawJSON = cliCtx.Codec.MustMarshalJSON(stdSignMsg)
-			}
+	//bech32PrefixAccAddr := GetConfig().GetBech32AccountAddrPrefix()
 
-			_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", rawJSON)
+	bech32Addr, err := bech32.ConvertAndEncode("certik", aa.Bytes())
+	if err != nil {
+		panic(err)
+	}
 
-			buf := bufio.NewReader(os.Stdin)
-			ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf)
-			if err != nil || !ok {
-				_, _ = fmt.Fprintf(os.Stderr, "%s\n", "canceled transaction")
-				return sdk.TxResponse{}, err
-			}
-		}
-
-		// build and sign the transaction
-		txBytes, err := txBldr.BuildAndSign(fromName, keys.DefaultKeyPass, msgs)
-		if err != nil {
-			return sdk.TxResponse{}, err
-		}
-
-		// broadcast to a Tendermint node
-		res, err := cliCtx.BroadcastTx(txBytes)
-		if err != nil {
-			return sdk.TxResponse{}, err
-		}
-
-		return res, nil
-
-	*/
+	return bech32Addr
 }
 
 // callContract calls contract on certik-chain.
-func callContract(ctx types.Context, calleeString string, function string, args []string) (bool, string, error) {
+func callContract(ctx types.Context, callee string, function string, args []string) (bool, string, error) {
 	cliCtx := ctx.ClientContext()
 
-	calleeAddr, err := sdk.AccAddressFromBech32(calleeString)
+	caller := cliCtx.GetFromAddress().String()
+
+	calleeAddr, err := accAddressFromBech32(callee)
 	if err != nil {
 		return false, "", err
 	}
@@ -164,12 +138,12 @@ func callContract(ctx types.Context, calleeString string, function string, args 
 		return false, "", err
 	}
 
-	abiSpec, err := queryAbi(cliCtx, cvmtypes.QuerierRoute, calleeString)
+	abiSpec, err := queryAbi(cliCtx, callee)
 	if err != nil {
 		return false, "", err
 	}
-
-	data, err := parseData(function, abiSpec, args, logging.NewNoopLogger())
+	abi := []byte(abiSpec) // TODO
+	data, err := parseData(function, abi, args, logging.NewNoopLogger())
 	if err != nil {
 		return false, "", err
 	}
@@ -177,7 +151,7 @@ func callContract(ctx types.Context, calleeString string, function string, args 
 	// Decode abiSpec to check if the called function's type is view or pure.
 	// If it is, reroute to query.
 	var abiEntries []types.ABIEntry
-	err = json.Unmarshal(abiSpec, &abiEntries)
+	err = json.Unmarshal(abi, &abiEntries)
 	if err != nil {
 		return false, "", err
 	}
@@ -188,8 +162,7 @@ func callContract(ctx types.Context, calleeString string, function string, args 
 		if entry.Type != "view" && entry.Type != "pure" {
 			return false, "", fmt.Errorf("getInsight function should be view or pure function")
 		}
-		queryPath := fmt.Sprintf("custom/%s/view/%s/%s", cvmtypes.QuerierRoute, cliCtx.GetFromAddress(), calleeAddr)
-		return queryContract(cliCtx, queryPath, function, abiSpec, data)
+		return queryContract(cliCtx, caller, callee, function, abi, data)
 	}
 	return false, "", fmt.Errorf("function %s was not found in abi", function)
 }
@@ -207,12 +180,15 @@ func parseData(function string, abiSpec []byte, args []string, logger *logging.L
 		argi = arg
 		for _, prefix := range []string{common.Bech32MainPrefix, common.Bech32PrefixConsAddr, common.Bech32PrefixAccAddr} {
 			if strings.HasPrefix(arg, prefix) && ((len(arg) - len(prefix)) == 39) {
-				data, _ := sdk.GetFromBech32(arg, prefix)
-				var err error
-				argi, err = crypto.AddressFromBytes(data)
+				data, err := sdk.GetFromBech32(arg, prefix)
 				if err != nil {
 					return nil, err
 				}
+				addr, err := crypto.AddressFromBytes(data)
+				if err != nil {
+					return nil, err
+				}
+				argi = addr[:]
 				break
 			}
 		}

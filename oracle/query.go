@@ -1,11 +1,9 @@
 package oracle
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"strconv"
-
-	"github.com/hyperledger/burrow/execution/evm/abi"
 
 	"github.com/cosmos/cosmos-sdk/client"
 
@@ -13,40 +11,35 @@ import (
 )
 
 // queryAbi queries ABI from certik chain
-func queryAbi(cliCtx client.Context, queryRoute string, addr string) ([]byte, error) {
-	res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/abi/%s", queryRoute, addr), nil)
+func queryAbi(cliCtx client.Context, addr string) (string, error) {
+	queryClient := cvmtypes.NewQueryClient(cliCtx)
+
+	res, err := queryClient.Abi(context.Background(), &cvmtypes.QueryAbiRequest{Address: addr})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	var out cvmtypes.QueryResAbi
-	cliCtx.LegacyAmino.MustUnmarshalJSON(res, &out)
-	return out.Abi, nil
+	return res.Abi, nil
 }
 
 // queryContract queries contract on certik-chain.
-func queryContract(
-	cliCtx client.Context,
-	queryPath, fname string,
-	abiSpec, data []byte,
-) (bool, string, error) {
-	res, _, err := cliCtx.QueryWithData(queryPath, data)
+func queryContract(cliCtx client.Context, caller, callee, fname string, abiSpec, data []byte) (bool, string, error) {
+	queryClient := cvmtypes.NewQueryClient(cliCtx)
+
+	res, err := queryClient.View(
+		context.Background(),
+		&cvmtypes.QueryViewRequest{
+			Caller: caller,
+			Callee: callee,
+			AbiSpec: abiSpec,
+			FunctionName: fname,
+			Data: data,
+		})
 	if err != nil {
 		return false, "", fmt.Errorf("querying security primitive contract: %v", err)
 	}
-	var out cvmtypes.QueryResView
-	err = json.Unmarshal(res, &out)
-	if err != nil {
-		return false, "", err
-	}
-	ret, err := abi.DecodeFunctionReturn(string(abiSpec), fname, out.Ret)
-	if err != nil {
-		return false, "", fmt.Errorf("decoding function return: %v", err)
-	}
-	if len(ret) != 2 {
-		return false, "", fmt.Errorf("mismatch return length: %v", ret)
-	}
 
+	ret := res.ReturnVars
 	retBool, err := strconv.ParseBool(ret[0].Value)
 	if err != nil {
 		return false, "", fmt.Errorf("decoding function return: %v", err)

@@ -6,6 +6,7 @@ require (
 	github.com/certikfoundation/shentu v1.1.1-0.20210401164204-2763c53c046f
 	github.com/cosmos/cosmos-sdk v0.41.0
 	github.com/hyperledger/burrow v0.31.0
+	github.com/rs/zerolog v1.20.0
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
