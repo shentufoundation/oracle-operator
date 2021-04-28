@@ -6,7 +6,7 @@ Oracle Operator listens to the `create_task` event from CertiK Chain, queries th
 
 1. Register the operator on CertiK Chain (through CLI or RESTful API) and lock a certain amount of `CTK`.
   ```bash
-  $ certik tx oracle create-operator <account address> <collateral> --name <operator name> --from <account> --fees 5000uctk -y -b block
+  $ certik tx oracle create-operator <account address> <collateral> --name <operator name> --from <account> --fees 5000uctk --chain-id <chainid> -y -b block
   ```
 2. Create the oracle operator configuration file in `certik` home (default `.certik/config/oracle-operator.toml`). See template at [oracle-operator.toml](oracle-operator.toml):
   - `type`: Aggregation type, e.g. `linear`. Check [Strategy](STRATEGY.md).
@@ -14,14 +14,14 @@ Oracle Operator listens to the `create_task` event from CertiK Chain, queries th
   - `weight`: the weight of the result from the corresponding primitive to the final result.
 3. Run the oracle operator by the following command.
   ```bash
-  $ certik oracle-operator --from <account>
+  $ oracle-operator start --home ~/.certik --from <account>
   ```
 
 A sample shell script of running Oracle Operator:
 
 ```bash
 certik tx oracle create-operator $(certik keys show alice --keyring-backend test -a) 100000uctk --from alice --fees 5000uctk -y -b block
-certik oracle-operator --log_level "debug" --keyring-backend test --from alice
+oracle-operator start --home ~/.certik --log_level "debug" --keyring-backend test --from alice
 ```
 
 ## Support of Multiple Client Chain

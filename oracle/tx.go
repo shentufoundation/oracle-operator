@@ -15,7 +15,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/bech32"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/certikfoundation/shentu/common"
@@ -86,50 +85,13 @@ func CompleteAndBroadcastTx(cliCtx client.Context, txf tx.Factory, msgs []sdk.Ms
 	return *res, nil
 }
 
-// accAddressFromBech32 creates an AccAddress from a Bech32 string.
-func accAddressFromBech32(address string) (addr sdk.AccAddress, err error) {
-	if len(strings.TrimSpace(address)) == 0 {
-		return sdk.AccAddress{}, fmt.Errorf("empty address string is not allowed")
-	}
-
-	//bech32PrefixAccAddr := GetConfig().GetBech32AccountAddrPrefix()
-
-	bz, err := sdk.GetFromBech32(address, "certik")
-	if err != nil {
-		return nil, err
-	}
-
-	err = sdk.VerifyAddressFormat(bz)
-	if err != nil {
-		return nil, err
-	}
-
-	return sdk.AccAddress(bz), nil
-}
-
-// String implements the Stringer interface.
-func stringify(aa sdk.AccAddress) string {
-	if aa.Empty() {
-		return ""
-	}
-
-	//bech32PrefixAccAddr := GetConfig().GetBech32AccountAddrPrefix()
-
-	bech32Addr, err := bech32.ConvertAndEncode("certik", aa.Bytes())
-	if err != nil {
-		panic(err)
-	}
-
-	return bech32Addr
-}
-
 // callContract calls contract on certik-chain.
 func callContract(ctx types.Context, callee string, function string, args []string) (bool, string, error) {
 	cliCtx := ctx.ClientContext()
 
 	caller := cliCtx.GetFromAddress().String()
 
-	calleeAddr, err := accAddressFromBech32(callee)
+	calleeAddr, err := sdk.AccAddressFromBech32(callee)
 	if err != nil {
 		return false, "", err
 	}
