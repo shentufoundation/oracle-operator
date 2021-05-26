@@ -14,14 +14,14 @@ Oracle Operator listens to the `create_task` event from CertiK Chain, queries th
   - `weight`: the weight of the result from the corresponding primitive to the final result.
 3. Run the oracle operator by the following command.
   ```bash
-  $ oracle-operator start --home ~/.certik --from <account>
+  $ oracle-operator start --home ~/.certik --log_level debug --from <account> --chain-id <chainid>
   ```
 
 A sample shell script of running Oracle Operator:
 
 ```bash
-certik tx oracle create-operator $(certik keys show alice --keyring-backend test -a) 100000uctk --from alice --fees 5000uctk -y -b block
-oracle-operator start --home ~/.certik --log_level "debug" --keyring-backend test --from alice
+certik tx oracle create-operator $(certik keys show alice -a) 100000uctk --from alice --fees 5000uctk --chain-id yulei-4 -y -b block
+oracle-operator start --home ~/.certik --log_level debug --from alice --chain-id yulei-4
 ```
 
 ## Support of Multiple Client Chain
