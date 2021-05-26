@@ -53,14 +53,15 @@ weight = 0.1
 Security Primitive Contract wraps a security endpoint to chain.
 
 1. Set function `getEndpointUrl` based on template at [SecurityPrimtive.sol](contracts/SecurityPrimitive.sol).
-2. Deploy your SecurityPrimitive Contract on CertiK Chain
+2. Compile and deploy your SecurityPrimitive Contract on CertiK Chain
   ```bash
-  certik tx cvm deploy SecurityPrimitive.sol --args <security-primitive-endpoint> --from <account> --gas-prices 0.025uctk --gas-adjustment 2.0 --gas auto -y -b block
+  solc ~/dev/oracle-toolset/contracts/SecurityPrimitiveOnChain.sol --abi --bin -o .
+  certik tx cvm deploy SecurityPrimitive.bin --abi SecurityPrimitive.abi --args <security-primitive-endpoint> --from <account> --chain-id <chainid> -gas-prices 0.025uctk --gas-adjustment 2.0 --gas auto -y -b block
   ```
 3. Record your SecurityPrimitive Contract's address `new-contract-address` from screen output.
 4. Check your PrimitivePrimitive Contract by querying `getInsight` function.
   ```bash
-  certik tx cvm call <primitive-contract-address> "getInsight" "0x00000000000000000000" "0x0100" --from <account> --gas-prices 0.025uctk --gas-adjustment 2.0 --gas auto -y -b block
+  certik tx cvm call <primitive-contract-address> "getInsight" "0x00000000000000000000" "0x0100" --from <account>
   ```
 5. Set your contract address in the oracle-operator configuration file (`~/.certik/config/oracle-operator.toml`).
 
