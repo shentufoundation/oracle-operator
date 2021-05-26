@@ -8,6 +8,3 @@ type = "linear"
 [[strategy.eth.primitive]]
 primitive_contract_address = "certik12w4spwv6ku9q8qmmkj5tgj5gjtmhf634zcwaxk"
 weight = 0.1
-[[strategy.eth.primitive]]
-primitive_contract_address = "certik12w4spwv6ku9q8qmmkj5tgj5gjtmhf634zcwaxk"
-weight = 0.1

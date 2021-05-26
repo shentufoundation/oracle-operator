@@ -62,10 +62,11 @@ func ServeCommand() *cobra.Command {
 
 // registerFlags registers additional flags to the command.
 func registerFlags(cmd *cobra.Command) *cobra.Command {
+	cmd.Flags().String(flags.FlagChainID, "", "The network chain ID")
 	flags.AddTxFlagsToCmd(cmd)
 	cmd.Flags().Uint(types.FlagRPCReadTimeout, 10, "RPC read timeout (in seconds)")
 	cmd.Flags().Uint(types.FlagRPCWriteTimeout, 10, "RPC write timeout (in seconds)")
-	cmd.Flags().String(types.FlagLogLevel, tmconfig.DefaultLogLevel(), "Log level")
+	cmd.Flags().String(types.FlagLogLevel, tmconfig.DefaultLogLevel, "Log level")
 	cmd.Flags().String(types.FlagConfigFile, types.DefaultConfigFileName, "Name of the config file")
 	return cmd
 }

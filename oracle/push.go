@@ -16,8 +16,8 @@ func Push(ctx types.Context, ctkMsgChan <-chan interface{}, errorChan chan<- err
 			return
 		case msg := <-ctkMsgChan:
 			switch m := msg.(type) {
-			case oracletypes.MsgTaskResponse:
-				go PushMsgTaskResponse(ctx.WithLoggerLabels("type", "MsgTaskResponse"), m)
+			case *oracletypes.MsgTaskResponse:
+				go PushMsgTaskResponse(ctx.WithLoggerLabels("type", "MsgTaskResponse"), *m)
 			}
 		}
 	}

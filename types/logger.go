@@ -19,7 +19,7 @@ func initLogger() (err error) {
 		logger = log.NewTracingLogger(logger)
 	}
 	if viper.GetString(FlagLogLevel) != "" {
-		logger, err = flags.ParseLogLevel(viper.GetString(FlagLogLevel), logger, tmconfig.DefaultLogLevel())
+		logger, err = flags.ParseLogLevel(viper.GetString(FlagLogLevel), logger, tmconfig.DefaultLogLevel)
 		if err != nil {
 			return err
 		}
