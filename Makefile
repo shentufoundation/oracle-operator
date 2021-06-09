@@ -8,7 +8,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=certik \
 
 ldflags := $(strip $(ldflags))
 
-BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
+BUILD_FLAGS := -ldflags '$(ldflags)'
 
 install: go.sum
 	go build $(BUILD_FLAGS) -o oracle-operator .

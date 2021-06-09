@@ -1,6 +1,6 @@
 # Oracle Operator
 
-Oracle Operator listens to the `create_task` event from CertiK Chain, queries the primitives and pushes the result back to CertiK Chain.
+Oracle Operator listens to the `creat_task` event from CertiK Chain, queries the primitive APIs and pushes the aggregated result back to CertiK Chain.
 
 ## How to Config and Run
 
@@ -10,7 +10,7 @@ Oracle Operator listens to the `create_task` event from CertiK Chain, queries th
   ```
 2. Create the oracle operator configuration file in `certik` home (default `.certik/config/oracle-operator.toml`). See template at [oracle-operator.toml](oracle-operator.toml):
   - `type`: Aggregation type, e.g. `linear`. Check [Strategy](STRATEGY.md).
-  - `primitive_contract_address`: security primitive contract address.
+  - `primitive_type`: security primitive type.
   - `weight`: the weight of the result from the corresponding primitive to the final result.
 3. Run the oracle operator by the following command.
   ```bash
@@ -32,45 +32,24 @@ Contract addresses in security oracle tasks are prefixed with the chain identifi
 [strategy.eth]
 type = "linear"
 [[stragety.eth.primitive]]
-primitive_contract_address = "certik111..."
+primitive_type = "whitelist"
 weight = 0.1
 [[stragety.eth.primitive]]
-primitive_contract_address = "certik222..."
+primitive_type = "bytecode"
 weight = 0.1
 
 [strategy.bsc]
 type = "linear"
 [[stragety.bsc.primitive]]
-primitive_contract_address = "certik333..."
+primitive_type = "sourcecode"
 weight = 0.1
 [[stragety.bsc.primitive]]
-primitive_contract_address = "certik444..."
+primitive_type = "blacklist"
 weight = 0.1
 ```
-
-### How to Deploy SecurityPrimitive Contract on CertiK Chain
-
-Security Primitive Contract wraps a security endpoint to chain.
-
-1. Set function `getEndpointUrl` based on template at [SecurityPrimtive.sol](contracts/SecurityPrimitive.sol).
-2. Compile and deploy your SecurityPrimitive Contract on CertiK Chain
-  ```bash
-  solc ~/dev/oracle-toolset/contracts/SecurityPrimitiveOnChain.sol --abi --bin -o .
-  certik tx cvm deploy SecurityPrimitive.bin --abi SecurityPrimitive.abi --args <security-primitive-endpoint> --from <account> --chain-id <chainid> -gas-prices 0.025uctk --gas-adjustment 2.0 --gas auto -y -b block
-  ```
-3. Record your SecurityPrimitive Contract's address `new-contract-address` from screen output.
-4. Check your PrimitivePrimitive Contract by querying `getInsight` function.
-  ```bash
-  certik tx cvm call <primitive-contract-address> "getInsight" "0x00000000000000000000" "0x0100" --from <account>
-  ```
-5. Set your contract address in the oracle-operator configuration file (`~/.certik/config/oracle-operator.toml`).
 
 ## Modules
 
 ### Chain `x/oracle`
 
 The `x/oracle` module in chain handles operator registry and task management (create, response, delete, etc...)
-
-## Oracle Operator
-
-The oracle operator listens to the `create_task` event published by certik chain, queries the primitive endpoint for the task result and delivers the result back to certik chain.
