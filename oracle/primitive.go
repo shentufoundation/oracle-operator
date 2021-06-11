@@ -40,7 +40,7 @@ func queryPrimitive(
 
 	endpoint := url.URL{
 		Scheme: "https",
-		Host:   primitive.PrimitiveType + "-primitive.certik-security-oracle.com",
+		Host:   primitive.PrimitiveType + ".certik-skynet.com",
 		Path:   "score",
 	}
 	q := endpoint.Query()

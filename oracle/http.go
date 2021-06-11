@@ -17,7 +17,7 @@ import (
 func packRequest(ctx types.Context, endpoint string, payload interface{}) (*http.Request, error) {
 	var err error
 	var req *http.Request
-	logger := ctx.Logger().With("type", "request", "endpiont", endpoint, "payload", payload)
+	logger := ctx.Logger().With("type", "request", "endpoint", endpoint, "payload", payload)
 	config := ctx.Config()
 
 	var requestBody []byte

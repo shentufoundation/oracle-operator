@@ -1,21 +1,47 @@
-method = "GET" 
-retry_times = 3 
+method = "GET"
+retry_times = 3
 timeout = 300 # second
 
 [strategy.eth]
+# combination strategy
 type = "linear"
-[[stragety.eth.primitive]]
-primitive_type = "whitelist"
-weight = 0.1
-[[stragety.eth.primitive]]
-primitive_type = "bytecode"
-weight = 0.1
+[[strategy.eth.primitive]]
+primitive_type = "static-analysis-primitive-v3"
+weight = 3
+[[strategy.eth.primitive]]
+primitive_type = "onchain-monitoring-primitive-v3"
+weight = 5
+[[strategy.eth.primitive]]
+primitive_type = "social-sentiment-primitive-v3"
+weight = 5
+[[strategy.eth.primitive]]
+primitive_type = "governance-autonomy-primitive-v3"
+weight = 10
+[[strategy.eth.primitive]]
+primitive_type = "market-volatility-primitive-v3"
+weight = 10
+[[strategy.eth.primitive]]
+primitive_type = "safety-assessment-primitive-v3"
+weight = 10
 
 [strategy.bsc]
+# combination strategy
 type = "linear"
-[[stragety.bsc.primitive]]
-primitive_type = "sourcecode"
-weight = 0.1
-[[stragety.bsc.primitive]]
-primitive_type = "blacklist"
-weight = 0.1
+[[strategy.bsc.primitive]]
+primitive_type = "static-analysis-primitive-v3"
+weight = 3
+[[strategy.bsc.primitive]]
+primitive_type = "onchain-monitoring-primitive-v3"
+weight = 5
+[[strategy.bsc.primitive]]
+primitive_type = "social-sentiment-primitive-v3"
+weight = 5
+[[strategy.bsc.primitive]]
+primitive_type = "governance-autonomy-primitive-v3"
+weight = 10
+[[strategy.bsc.primitive]]
+primitive_type = "market-volatility-primitive-v3"
+weight = 10
+[[strategy.bsc.primitive]]
+primitive_type = "safety-assessment-primitive-v3"
+weight = 10
