@@ -5,7 +5,8 @@ COMMIT := $(shell git log -1 --format='%H')
 
 export GO111MODULE = on
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=oracle-operator \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=certik \
+		  -X github.com/cosmos/cosmos-sdk/version.ServerName=oracle-operator \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 
