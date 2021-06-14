@@ -27,15 +27,6 @@ func queryPrimitive(
 	wg *sync.WaitGroup,
 ) {
 	logger := ctx.Logger()
-	/*
-		logger.Debug("query primitive")
-		retBool, retString, err := callContract(
-			ctx,
-			primitive.PrimitiveContractAddr,
-			types.PrimitiveContractFnName,
-			[]string{payload.Contract, payload.Function},
-		)
-	*/
 	logger.Debug("query primitive", "contract", payload.Contract, "function", payload.Function)
 
 	endpoint := url.URL{
@@ -59,37 +50,6 @@ func queryPrimitive(
 		return
 	}
 
-	/*
-		var score uint8
-		if retBool {
-			_, err := url.ParseRequestURI(retString)
-			if err != nil {
-				logger.Error(err.Error())
-				wg.Done()
-				return
-			}
-			score, err = handleRequest(
-				ctx.WithLoggerLabels("submodule", "querier", "endpoint", retString, "payload", payload),
-				retString,
-				payload,
-			)
-			if err != nil {
-				logger.Error(err.Error())
-				wg.Done()
-				return
-			}
-			logger.Debug("got score from primitive endpoint", "url", retString, "score", score)
-		} else {
-			retScore, err := strconv.ParseUint(retString, 10, 8)
-			if err != nil {
-				logger.Error(err.Error())
-				wg.Done()
-				return
-			}
-			score = uint8(retScore)
-			logger.Debug("got score from Security Primitive on certik chain", "score", score)
-		}
-	*/
 	logger.Debug("got score from primitive endpoint", "url", endpointUrl, "score", score)
 	primitiveScores <- types.PrimitiveScore{Score: score, Primitive: primitive}
 	wg.Done()

@@ -1,4 +1,4 @@
-module github.com/certikfoundation/oracle-toolset
+module github.com/certikfoundation/oracle-operator
 
 go 1.16
 
