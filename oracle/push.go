@@ -5,7 +5,7 @@ import (
 
 	oracletypes "github.com/certikfoundation/shentu/x/oracle/types"
 
-	"github.com/certikfoundation/oracle-toolset/types"
+	"github.com/certikfoundation/oracle-operator/types"
 )
 
 // Push pushes MsgInquiryEvent to certik chain.

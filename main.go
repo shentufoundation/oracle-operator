@@ -7,7 +7,7 @@ import (
 
 	"github.com/certikfoundation/shentu/app"
 
-	"github.com/certikfoundation/oracle-toolset/cmd"
+	"github.com/certikfoundation/oracle-operator/cmd"
 )
 
 func main() {

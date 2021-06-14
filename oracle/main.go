@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/server"
 
-	"github.com/certikfoundation/oracle-toolset/types"
+	"github.com/certikfoundation/oracle-operator/types"
 )
 
 // starts the oracle operator.

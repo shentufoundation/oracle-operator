@@ -11,8 +11,7 @@ ldflags := $(strip $(ldflags))
 BUILD_FLAGS := -ldflags '$(ldflags)'
 
 install: go.sum
-	go build $(BUILD_FLAGS) -o oracle-operator .
-	mv oracle-operator $(GOBIN)
+	go install $(BUILD_FLAGS) .
 
 release: go.sum
 	GOOS=linux go build $(BUILD_FLAGS) -o build/oracle-operator .

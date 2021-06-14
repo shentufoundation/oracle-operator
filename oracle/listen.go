@@ -11,7 +11,7 @@ import (
 
 	oracletypes "github.com/certikfoundation/shentu/x/oracle/types"
 
-	"github.com/certikfoundation/oracle-toolset/types"
+	"github.com/certikfoundation/oracle-operator/types"
 )
 
 // Listen listens for events from CertiK chain.

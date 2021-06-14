@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/certikfoundation/oracle-toolset/types"
+	"github.com/certikfoundation/oracle-operator/types"
 )
 
 // packRequest packs payload to http request.

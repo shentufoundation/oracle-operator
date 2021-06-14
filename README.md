@@ -1,6 +1,6 @@
 # Oracle Operator
 
-Oracle Operator listens to the `creat_task` event from CertiK Chain, queries the primitive APIs and pushes the aggregated result back to CertiK Chain.
+Oracle Operator listens to the `create_task` event from CertiK Chain, queries the primitive APIs and pushes the aggregated result back to CertiK Chain.
 
 ## How to Config and Run
 
