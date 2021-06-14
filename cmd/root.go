@@ -15,6 +15,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/certikfoundation/shentu/app"
@@ -63,9 +64,11 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 }
 
 func initRootCmd(rootCmd *cobra.Command) {
-	rootCmd.AddCommand(oracle.ServeCommand())
-
-	rootCmd.AddCommand(keys.Commands(app.DefaultNodeHome))
+	rootCmd.AddCommand(
+		oracle.ServeCommand(),
+		keys.Commands(app.DefaultNodeHome),
+		version.NewVersionCommand(),
+	)
 }
 
 func Execute(rootCmd *cobra.Command, defaultHome string) error {
