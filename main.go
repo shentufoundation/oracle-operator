@@ -5,7 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/server"
 
-	"github.com/certikfoundation/shentu/app"
+	"github.com/certikfoundation/shentu/v2/app"
 
 	"github.com/certikfoundation/oracle-operator/cmd"
 )

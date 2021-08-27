@@ -1,6 +1,6 @@
 PKG_LIST := $(shell go list ./...)
 GOBIN ?= $(GOPATH)/bin
-VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
+VERSION := $(shell echo $(shell git describe --tags --always) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 
 export GO111MODULE = on

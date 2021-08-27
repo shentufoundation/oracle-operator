@@ -9,7 +9,7 @@ import (
 	ctkClient "github.com/tendermint/tendermint/rpc/client/http"
 	tendermintTypes "github.com/tendermint/tendermint/types"
 
-	oracletypes "github.com/certikfoundation/shentu/x/oracle/types"
+	oracletypes "github.com/certikfoundation/shentu/v2/x/oracle/types"
 
 	"github.com/certikfoundation/oracle-operator/types"
 )

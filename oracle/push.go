@@ -3,7 +3,7 @@ package oracle
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	oracletypes "github.com/certikfoundation/shentu/x/oracle/types"
+	oracletypes "github.com/certikfoundation/shentu/v2/x/oracle/types"
 
 	"github.com/certikfoundation/oracle-operator/types"
 )

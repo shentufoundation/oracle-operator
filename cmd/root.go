@@ -18,9 +18,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/certikfoundation/shentu/app"
-	"github.com/certikfoundation/shentu/app/params"
-	"github.com/certikfoundation/shentu/common"
+	"github.com/certikfoundation/shentu/v2/app"
+	"github.com/certikfoundation/shentu/v2/app/params"
+	"github.com/certikfoundation/shentu/v2/common"
 
 	"github.com/certikfoundation/oracle-operator/oracle"
 )
