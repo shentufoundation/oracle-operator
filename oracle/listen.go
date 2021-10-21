@@ -85,11 +85,19 @@ func handleMsgCreateTask(ctx types.Context, event abciTypes.Event, ctkMsgChan ch
 		return
 	}
 	logger.Debug("task payload", "type", "create_task", "payload", payload)
+
 	// get aggregation strategy
-	strategy, ok := ctx.Config().Strategy[payload.Client]
+	var strategy types.Strategy
+	var ok bool
+	strategy, ok = ctx.Config().Strategy[payload.Client]
 	if !ok {
-		logger.Error("target client chain strategy not specified", "client", payload.Client, "payload", payload)
-		return
+		// use default strategy if specific client is not found in config
+		strategy, ok = ctx.Config().Strategy["default"]
+		logger.Info("Chain configuration has not been set. Use default chain configuration instead.")
+		if !ok {
+			logger.Error("target client chain strategy not specified", "client", payload.Client, "payload", payload)
+			return
+		}
 	}
 	aggregator, err := NewAggregation(strategy)
 	if err != nil {
