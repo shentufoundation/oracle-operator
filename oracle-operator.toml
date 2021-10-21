@@ -45,3 +45,25 @@ weight = 10
 [[strategy.bsc.primitive]]
 primitive_type = "safety-assessment-primitive-v3"
 weight = 10
+
+[strategy.default]
+# combination strategy
+type = "linear"
+[[strategy.default.primitive]]
+primitive_type = "static-analysis-primitive-v3"
+weight = 3
+[[strategy.default.primitive]]
+primitive_type = "onchain-monitoring-primitive-v3"
+weight = 5
+[[strategy.default.primitive]]
+primitive_type = "social-sentiment-primitive-v3"
+weight = 5
+[[strategy.default.primitive]]
+primitive_type = "governance-autonomy-primitive-v3"
+weight = 10
+[[strategy.default.primitive]]
+primitive_type = "market-volatility-primitive-v3"
+weight = 10
+[[strategy.default.primitive]]
+primitive_type = "safety-assessment-primitive-v3"
+weight = 10
