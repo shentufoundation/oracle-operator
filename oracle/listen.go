@@ -62,6 +62,9 @@ func Listen(ctx types.Context, ctkMsgChan chan<- interface{}, fatalError chan<- 
 				case "create_task":
 					logger.Info("Received event", "type", "create_task")
 					go handleMsgCreateTask(ctx.WithLoggerLabels("type", "create_task"), event, ctkMsgChan)
+				case "compute_score":
+					logger.Info("Received event", "type", "compute_score")
+					go handleMsgComputeScoreTask(ctx.WithLoggerLabels("type", "compute_score"), event, ctkMsgChan)
 				}
 			}
 		}
@@ -174,4 +177,9 @@ func parseMsgCreateTaskContract(contract string) (types.Client, string, error) {
 		return "", "", fmt.Errorf(contract)
 	}
 	return types.Client(strings.Join(seg[:len(seg)-1], ":")), seg[len(seg)-1], nil
+}
+
+// handleMsgEndpointQuery parses MsgEndpointQuery TX data and passes organized message to endpoint querier.
+func handleMsgComputeScoreTask(ctx types.Context, event abciTypes.Event, ctkMsgChan chan<- interface{}) {
+
 }
