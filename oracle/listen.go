@@ -9,9 +9,9 @@ import (
 	ctkClient "github.com/tendermint/tendermint/rpc/client/http"
 	tendermintTypes "github.com/tendermint/tendermint/types"
 
-	oracletypes "github.com/certikfoundation/shentu/v2/x/oracle/types"
+	oracletypes "github.com/shentufoundation/shentu/v2/x/oracle/types"
 
-	"github.com/certikfoundation/oracle-operator/types"
+	"github.com/shentufoundation/oracle-operator/types"
 )
 
 // Listen listens for events from CertiK chain.

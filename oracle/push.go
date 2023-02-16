@@ -1,11 +1,11 @@
 package oracle
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 
-	oracletypes "github.com/certikfoundation/shentu/v2/x/oracle/types"
+	oracletypes "github.com/shentufoundation/shentu/v2/x/oracle/types"
 
-	"github.com/certikfoundation/oracle-operator/types"
+	"github.com/shentufoundation/oracle-operator/types"
 )
 
 // Push pushes MsgInquiryEvent to certik chain.
@@ -30,20 +30,10 @@ func PushMsgTaskResponse(ctx types.Context, msg oracletypes.MsgTaskResponse) {
 		ctx.Logger().Error(err.Error())
 		return
 	}
-	receipt, err := CompleteAndBroadcastTx(ctx.ClientContext(), ctx.TxBuilder(), []sdk.Msg{&msg})
+	err := tx.BroadcastTx(ctx.ClientContext(), ctx.TxBuilder(), &msg)
 	if err != nil {
 		ctx.Logger().Error(err.Error())
 		return
 	}
-	ctx.Logger().Debug(
-		"CertiK MsgTaskResponse Receipt",
-		"height", receipt.Height,
-		"txHash", receipt.TxHash,
-		"data", receipt.Data,
-		"rawLog", receipt.RawLog,
-		"info", receipt.Info,
-		"gasUsed", receipt.GasUsed,
-		"timestamp", receipt.Timestamp,
-	)
 	logger.Debug("Finished pushing task response back to certik-chain")
 }

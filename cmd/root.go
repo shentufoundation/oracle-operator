@@ -14,15 +14,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/server"
+	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/certikfoundation/shentu/v2/app"
-	"github.com/certikfoundation/shentu/v2/app/params"
-	"github.com/certikfoundation/shentu/v2/common"
+	"github.com/shentufoundation/shentu/v2/app"
+	"github.com/shentufoundation/shentu/v2/app/params"
+	"github.com/shentufoundation/shentu/v2/common"
 
-	"github.com/certikfoundation/oracle-operator/oracle"
+	"github.com/shentufoundation/oracle-operator/oracle"
 )
 
 // NewRootCmd creates a new root command. It is called once in the
@@ -30,7 +31,7 @@ import (
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	encodingConfig := app.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
-		WithJSONMarshaler(encodingConfig.Marshaler).
+		WithCodec(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
 		WithTxConfig(encodingConfig.TxConfig).
 		WithLegacyAmino(encodingConfig.Amino).
@@ -48,13 +49,13 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	rootCmd := &cobra.Command{
 		Use:   "oracle-operator",
 		Short: "CertiK Chain Oracle Operator",
-		Long: `CertiK Oracle Operator listens to create_task events from CertiK Chain, queries primitives, and pushes result back to the chain.`,
+		Long:  `CertiK Oracle Operator listens to create_task events from CertiK Chain, queries primitives, and pushes result back to the chain.`,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
-
-			return server.InterceptConfigsPreRunHandler(cmd)
+			template, customAppConfig := initAppConfig()
+			return server.InterceptConfigsPreRunHandler(cmd, template, customAppConfig)
 		},
 	}
 
@@ -88,4 +89,25 @@ func Execute(rootCmd *cobra.Command, defaultHome string) error {
 
 	executor := tmcli.PrepareBaseCmd(rootCmd, "", defaultHome)
 	return executor.ExecuteContext(ctx)
+}
+
+// initAppConfig helps to override default appConfig template and configs.
+// return "", nil if no custom configuration is required for the application.
+func initAppConfig() (string, interface{}) {
+	type CustomAppConfig struct {
+		serverconfig.Config
+	}
+
+	// Optionally allow the chain developer to overwrite the SDK's default
+	// server config.
+	srvCfg := serverconfig.DefaultConfig()
+	srvCfg.API.Enable = true
+	srvCfg.StateSync.SnapshotInterval = 1500
+	srvCfg.StateSync.SnapshotKeepRecent = 2
+	srvCfg.MinGasPrices = "0.025" + common.MicroCTKDenom
+	srvCfg.IAVLDisableFastNode = false
+
+	AppTemplate := serverconfig.DefaultConfigTemplate
+
+	return AppTemplate, CustomAppConfig{*srvCfg}
 }

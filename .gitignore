@@ -4,3 +4,10 @@
 # Build
 build
 vendor
+
+
+# IDE
+.idea/
+.vscode
+*.iml
+debug.test

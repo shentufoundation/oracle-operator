@@ -5,9 +5,9 @@ import (
 	"net/url"
 	"sync"
 
-	oracletypes "github.com/certikfoundation/shentu/v2/x/oracle/types"
+	oracletypes "github.com/shentufoundation/shentu/v2/x/oracle/types"
 
-	"github.com/certikfoundation/oracle-operator/types"
+	"github.com/shentufoundation/oracle-operator/types"
 )
 
 func getPrimitivePayload(msg oracletypes.MsgCreateTask) (types.PrimitivePayload, error) {
