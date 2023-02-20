@@ -32,4 +32,7 @@ lint: tidy
 test: tidy
 	@GO111MODULE=on go test ${PKG_LIST}
 
+test-unit-cover: tidy
+	@GO111MODULE=on go test ${PKG_LIST} -timeout=5m -tags='norace' -coverprofile=coverage.txt -covermode=atomic
+
 all: install release lint
