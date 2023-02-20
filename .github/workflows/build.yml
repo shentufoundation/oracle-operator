@@ -1,4 +1,4 @@
-name: Compile Shentu Daemon
+name: Compile Shentu Oracle Operator
 
 # Controls when the action will run.
 #  This workflow runr on pushes to master & every Pull Requests. (Or when manually triggered)

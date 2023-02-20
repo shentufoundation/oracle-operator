@@ -17,6 +17,9 @@ BUILD_FLAGS := -ldflags '$(ldflags)'
 install: go.sum
 	go install $(BUILD_FLAGS) .
 
+build: go.sum
+    go build .
+
 release: go.sum
 	GOOS=linux go build $(BUILD_FLAGS) -o build/oracle-operator .
 	GOOS=windows go build $(BUILD_FLAGS) -o build/oracle-operator.exe .
