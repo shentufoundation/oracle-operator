@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/certikfoundation/oracle-operator/types"
+	"github.com/shentufoundation/oracle-operator/types"
 )
 
 // Aggregation for scores.

@@ -11,7 +11,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/certikfoundation/oracle-operator/types"
+	"github.com/shentufoundation/oracle-operator/types"
 )
 
 var (

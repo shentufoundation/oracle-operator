@@ -5,9 +5,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/server"
 
-	"github.com/certikfoundation/shentu/v2/app"
+	"github.com/shentufoundation/shentu/v2/app"
 
-	"github.com/certikfoundation/oracle-operator/cmd"
+	"github.com/shentufoundation/oracle-operator/cmd"
 )
 
 func main() {
