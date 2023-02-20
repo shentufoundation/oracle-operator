@@ -18,7 +18,7 @@ install: go.sum
 	go install $(BUILD_FLAGS) .
 
 build: go.sum
-    go build $(BUILD_FLAGS) .
+	go build $(BUILD_FLAGS) .
 
 release: go.sum
 	GOOS=linux go build $(BUILD_FLAGS) -o build/oracle-operator .
