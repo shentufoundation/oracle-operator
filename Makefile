@@ -5,7 +5,7 @@ COMMIT := $(shell git log -1 --format='%H')
 
 export GO111MODULE = on
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=certik \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=shentud \
 		  -X github.com/cosmos/cosmos-sdk/version.ServerName=oracle-operator \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
@@ -18,7 +18,7 @@ install: go.sum
 	go install $(BUILD_FLAGS) .
 
 build: go.sum
-    go build .
+    go build $(BUILD_FLAGS) .
 
 release: go.sum
 	GOOS=linux go build $(BUILD_FLAGS) -o build/oracle-operator .
