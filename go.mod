@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/cosmos/cosmos-sdk v0.45.9
-	github.com/rs/zerolog v1.28.0
+	github.com/rs/zerolog v1.29.0
 	github.com/shentufoundation/shentu/v2 v2.6.0
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.5.0
