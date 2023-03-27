@@ -48,8 +48,8 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
 	rootCmd := &cobra.Command{
 		Use:   "oracle-operator",
-		Short: "CertiK Chain Oracle Operator",
-		Long:  `CertiK Oracle Operator listens to create_task events from CertiK Chain, queries primitives, and pushes result back to the chain.`,
+		Short: "Shentu Chain Oracle Operator",
+		Long:  `Shentu Oracle Operator listens to create_task events from Shentu Chain, queries primitives, and pushes result back to the chain.`,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err

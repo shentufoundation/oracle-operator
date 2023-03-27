@@ -8,7 +8,7 @@ import (
 	"github.com/shentufoundation/oracle-operator/types"
 )
 
-// Push pushes MsgInquiryEvent to certik chain.
+// Push pushes MsgInquiryEvent to shentu chain.
 func Push(ctx types.Context, ctkMsgChan <-chan interface{}, errorChan chan<- error) {
 	for {
 		select {
@@ -23,7 +23,7 @@ func Push(ctx types.Context, ctkMsgChan <-chan interface{}, errorChan chan<- err
 	}
 }
 
-// PushMsgTaskResponse pushes MsgTaskResponse message to CertiK Chain.
+// PushMsgTaskResponse pushes MsgTaskResponse message to Shentu Chain.
 func PushMsgTaskResponse(ctx types.Context, msg oracletypes.MsgTaskResponse) {
 	logger := ctx.Logger()
 	if err := msg.ValidateBasic(); err != nil {
@@ -35,5 +35,5 @@ func PushMsgTaskResponse(ctx types.Context, msg oracletypes.MsgTaskResponse) {
 		ctx.Logger().Error(err.Error())
 		return
 	}
-	logger.Debug("Finished pushing task response back to certik-chain")
+	logger.Debug("Finished pushing task response back to shentu-chain")
 }

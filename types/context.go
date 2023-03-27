@@ -22,13 +22,13 @@ type Context struct {
 // Context returns the internal context object.
 func (c Context) Context() context.Context { return c.ctx }
 
-// ClientContext returns a copy of the certik chain client context object value.
+// ClientContext returns a copy of the shentu chain client context object value.
 func (c Context) ClientContext() client.Context { return *c.CLIContext }
 
 // Codec returns a reference to the client codec.
 func (c Context) Codec() *amino.Codec { return c.CLIContext.LegacyAmino.Amino }
 
-// TxBuilder returns a copy of the certik chain transaction builder object.
+// TxBuilder returns a copy of the shentu chain transaction builder object.
 func (c Context) TxBuilder() tx.Factory { return *c.txFactory }
 
 // Config returns a copy of the oracle operator node global configuration.

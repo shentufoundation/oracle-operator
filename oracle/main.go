@@ -21,8 +21,8 @@ func start(ctx types.Context) {
 	ctx = ctx.WithLoggerLabels("module", "oracle-operator")
 	fatalError := make(chan error)
 	ctkMsgChan := make(chan interface{}, 1000)
-	go Listen(ctx.WithLoggerLabels("protocol", "certik", "submodule", "listener"), ctkMsgChan, fatalError)
-	go Push(ctx.WithLoggerLabels("protocol", "certik", "submodule", "pusher"), ctkMsgChan, fatalError)
+	go Listen(ctx.WithLoggerLabels("protocol", "shentu", "submodule", "listener"), ctkMsgChan, fatalError)
+	go Push(ctx.WithLoggerLabels("protocol", "shentu", "submodule", "pusher"), ctkMsgChan, fatalError)
 	// exit on fatal error
 	err := <-fatalError
 	ctx.Logger().Error(err.Error())
