@@ -14,12 +14,12 @@ import (
 	"github.com/shentufoundation/oracle-operator/types"
 )
 
-// Listen listens for events from CertiK chain.
+// Listen listens for events from Shentu chain.
 func Listen(ctx types.Context, ctkMsgChan chan<- interface{}, fatalError chan<- error) {
 	// load configuration and logger
 	logger := ctx.Logger()
 	node := ctx.ClientContext().NodeURI
-	logger.Info("start to listen to certik-chain", "node", node)
+	logger.Info("start to listen to shentu-chain", "node", node)
 
 	// initialize client
 	client, err := ctkClient.New(ctx.ClientContext().NodeURI, "/websocket")

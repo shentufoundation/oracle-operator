@@ -30,7 +30,7 @@ tidy:
 	@go mod tidy
 
 lint: tidy
-	@GO111MODULE=on golangci-lint run --config .golangci.yml
+	@GO111MODULE=on go run github.com/golangci/golangci-lint/cmd/golangci-lint run --timeout=10m
 
 test: tidy
 	@GO111MODULE=on go test ${PKG_LIST}
