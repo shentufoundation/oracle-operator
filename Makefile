@@ -5,11 +5,6 @@ COMMIT := $(shell git log -1 --format='%H')
 
 export GO111MODULE = on
 
-golangci-lint: $(GOLANGCI_LINT)
-$(GOLANGCI_LINT): ./install-golangci-lint.sh
-	@echo "Installing golangci-lint..."
-	@bash ./install-golangci-lint.sh $(GOBIN)
-
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=shentud \
 		  -X github.com/cosmos/cosmos-sdk/version.ServerName=oracle-operator \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
@@ -35,7 +30,7 @@ tidy:
 	@go mod tidy
 
 lint: tidy
-	@GO111MODULE=on golangci-lint run --config .golangci.yml
+	@GO111MODULE=on go run github.com/golangci/golangci-lint/cmd/golangci-lint run --timeout=10m
 
 test: tidy
 	@GO111MODULE=on go test ${PKG_LIST}
@@ -43,4 +38,4 @@ test: tidy
 test-unit-cover: tidy
 	@GO111MODULE=on go test ${PKG_LIST} -timeout=5m -tags='norace' -coverprofile=coverage.txt -covermode=atomic
 
-all: install release golangci-lint lint
+all: install release lint
