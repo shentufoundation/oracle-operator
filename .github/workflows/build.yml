@@ -26,7 +26,7 @@ jobs:
     name: shentu oracle operator ${{ matrix.arch }} for ${{ matrix.targetos }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3.3.0
+      - uses: actions/setup-go@v4
         with:
           go-version: '^1.19'
         env:
