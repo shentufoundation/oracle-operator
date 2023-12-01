@@ -11,9 +11,9 @@ Linear combination (with weights) of primitive scores.
 # combination strategy
 type = "linear"
 [[strategy.eth.primitive]]
-primitive_contract_address = "certik1r4834vyyu8vrarxgyatn34j8lsguyhn7csl0ju"
+primitive_contract_address = "shentu1r4834vyyu8vrarxgyatn34j8lsguyhn7hv8pp2"
 weight = 0.1
 [[strategy.eth.primitive]]
-primitive_contract_address = "certik1r4834vyyu8vrarxgyatn34j8lsguyhn7csl0ju"
+primitive_contract_address = "shentu1r4834vyyu8vrarxgyatn34j8lsguyhn7hv8pp2"
 weight = 0.1
 ```

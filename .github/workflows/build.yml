@@ -33,7 +33,7 @@ jobs:
           GOOS: ${{ matrix.targetos }}
           GOARCH: ${{ matrix.arch }}
 
-      - name: Compile certik binary
+      - name: Compile shentu binary
         run: |
           go mod download
           go build .

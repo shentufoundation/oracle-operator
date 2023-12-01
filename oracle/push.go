@@ -35,5 +35,6 @@ func PushMsgTaskResponse(ctx types.Context, msg oracletypes.MsgTaskResponse) {
 		ctx.Logger().Error(err.Error())
 		return
 	}
+
 	logger.Debug("Finished pushing task response back to shentu-chain")
 }

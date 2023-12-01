@@ -88,6 +88,7 @@ func Execute(rootCmd *cobra.Command, defaultHome string) error {
 	rootCmd.PersistentFlags().String(flags.FlagLogFormat, tmcfg.LogFormatPlain, "The logging format (json|plain)")
 
 	executor := tmcli.PrepareBaseCmd(rootCmd, "", defaultHome)
+
 	return executor.ExecuteContext(ctx)
 }
 
