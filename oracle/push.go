@@ -10,7 +10,6 @@ import (
 
 // Push pushes MsgInquiryEvent to shentu chain.
 func Push(ctx types.Context, ctkMsgChan <-chan interface{}, errorChan chan<- error) {
-
 	for {
 		select {
 		case <-ctx.Context().Done():
@@ -22,7 +21,6 @@ func Push(ctx types.Context, ctkMsgChan <-chan interface{}, errorChan chan<- err
 			}
 		}
 	}
-
 }
 
 // PushMsgTaskResponse pushes MsgTaskResponse message to Shentu Chain.
@@ -37,5 +35,6 @@ func PushMsgTaskResponse(ctx types.Context, msg oracletypes.MsgTaskResponse) {
 		ctx.Logger().Error(err.Error())
 		return
 	}
+
 	logger.Debug("Finished pushing task response back to shentu-chain")
 }
