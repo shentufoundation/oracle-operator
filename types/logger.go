@@ -25,5 +25,6 @@ func initLogger() (err error) {
 		}
 	}
 	logger = logger.With("module", "Oracle-Operator")
+
 	return nil
 }
